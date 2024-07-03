@@ -2,16 +2,36 @@ package co.nextstep.chap1;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDateTime;
+import java.util.stream.Stream;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class StringCalculatorTest {
 
-	@Test
-	void 숫자의_합을_구한다() {
+	@ParameterizedTest
+	@MethodSource("provideStringAndExpected")
+	void 숫자의_합을_구한다(String target, int expected) {
 		StringCalculator stringCalculator = new StringCalculator(new Splitter());
-		int result = stringCalculator.add("1,2");
-		assertThat(result).isEqualTo(3);
+		int result = stringCalculator.add(target);
+		assertThat(result).isEqualTo(expected);
+	}
+
+	static Stream<Arguments> provideStringAndExpected() {
+		return Stream.of(
+			Arguments.of("1,2", 3),
+			Arguments.of("1,2,3", 6),
+			Arguments.of("1,2:3", 6),
+			Arguments.of(" 1,2", 3),
+			Arguments.of("1,2 ", 3),
+			Arguments.of("1, 2", 3),
+			Arguments.of(" 1 , 2 ", 3)
+		);
 	}
 
 	@Test
@@ -34,5 +54,12 @@ public class StringCalculatorTest {
 		assertThatThrownBy(() -> stringCalculator.add("1,-1"))
 			.isInstanceOf(RuntimeException.class);
 	}
+	//
+	// @Test
+	// void 커스텀_구분자를_포함한_숫자를_더한다() {
+	// 	StringCalculator stringCalculator = new StringCalculator(new Splitter());
+	// 	int result = stringCalculator.add("//;\n1;2;3");
+	// 	assertThat(result).isEqualTo(0);
+	// }
 
 }

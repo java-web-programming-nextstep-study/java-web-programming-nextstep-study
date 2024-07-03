@@ -11,6 +11,7 @@ public class Splitter {
 	public List<Integer> splitByDefaultDelimiter(String target) {
 		String delimiterPattern = String.join("|", DEFAULT_DELIMITERS);
 		return Arrays.stream(target.split(delimiterPattern))
+			.map(String::trim)
 			.map(Integer::parseInt)
 			.collect(Collectors.toList());
 	}
