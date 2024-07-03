@@ -30,7 +30,10 @@ public class StringCalculatorTest {
 			Arguments.of(" 1,2", 3),
 			Arguments.of("1,2 ", 3),
 			Arguments.of("1, 2", 3),
-			Arguments.of(" 1 , 2 ", 3)
+			Arguments.of(" 1 , 2 ", 3),
+			Arguments.of("0,0", 0),
+			Arguments.of("1,10,100", 111),
+			Arguments.of("1,00", 1)
 		);
 	}
 
@@ -54,12 +57,12 @@ public class StringCalculatorTest {
 		assertThatThrownBy(() -> stringCalculator.add("1,-1"))
 			.isInstanceOf(RuntimeException.class);
 	}
-	//
-	// @Test
-	// void 커스텀_구분자를_포함한_숫자를_더한다() {
-	// 	StringCalculator stringCalculator = new StringCalculator(new Splitter());
-	// 	int result = stringCalculator.add("//;\n1;2;3");
-	// 	assertThat(result).isEqualTo(0);
-	// }
+
+	@Test
+	void 커스텀_구분자를_포함한_숫자를_더한다() {
+		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		int result = stringCalculator.add("//;\n1;2;3");
+		assertThat(result).isEqualTo(6);
+	}
 
 }
