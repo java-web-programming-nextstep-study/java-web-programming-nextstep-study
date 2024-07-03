@@ -19,6 +19,13 @@ public class SplitterTest {
 	}
 
 	@Test
+	void 쉼표와_콜론이_섞인_문자열을_분리한다() {
+		Splitter splitter = new Splitter();
+		List<Integer> splited = splitter.splitByDefaultDelimiter("1,2:3");
+		assertThat(splited).containsExactly(1, 2, 3);
+	}
+
+	@Test
 	void 커스텀_구분자로_문자열을_분리한다() {
 		Splitter splitter = new Splitter();
 		List<Integer> splited = splitter.splitByDelimiter(";", "1;2;3");
