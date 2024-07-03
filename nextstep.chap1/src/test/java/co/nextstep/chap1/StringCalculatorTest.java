@@ -1,5 +1,6 @@
 package co.nextstep.chap1;
 
+import static co.nextstep.chap1.RegexSplitPattern.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.stream.Stream;
@@ -14,7 +15,7 @@ public class StringCalculatorTest {
 	@ParameterizedTest
 	@MethodSource("provideStringAndExpected")
 	void 숫자의_합을_구한다(String target, int expected) {
-		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		StringCalculator stringCalculator = new StringCalculator(new Splitter(), CUSTOM_DELIMITER);
 		int result = stringCalculator.add(target);
 		assertThat(result).isEqualTo(expected);
 	}
@@ -36,28 +37,28 @@ public class StringCalculatorTest {
 
 	@Test
 	void 공백의_합은_0이다() {
-		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		StringCalculator stringCalculator = new StringCalculator(new Splitter(), CUSTOM_DELIMITER);
 		int result = stringCalculator.add(" ");
 		assertThat(result).isEqualTo(0);
 	}
 
 	@Test
 	void 빈문자열의_합은_0이다() {
-		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		StringCalculator stringCalculator = new StringCalculator(new Splitter(), CUSTOM_DELIMITER);
 		int result = stringCalculator.add("");
 		assertThat(result).isEqualTo(0);
 	}
 
 	@Test
 	void 음수는_더할수없다() {
-		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		StringCalculator stringCalculator = new StringCalculator(new Splitter(), CUSTOM_DELIMITER);
 		assertThatThrownBy(() -> stringCalculator.add("1,-1"))
 			.isInstanceOf(RuntimeException.class);
 	}
 
 	@Test
 	void 커스텀_구분자를_포함한_숫자를_더한다() {
-		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		StringCalculator stringCalculator = new StringCalculator(new Splitter(), CUSTOM_DELIMITER);
 		int result = stringCalculator.add("//;\n1;2;3");
 		assertThat(result).isEqualTo(6);
 	}
