@@ -2,6 +2,7 @@ package co.nextstep.chap1;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class StringCalculatorTest {
@@ -25,6 +26,13 @@ public class StringCalculatorTest {
 		StringCalculator stringCalculator = new StringCalculator(new Splitter());
 		int result = stringCalculator.add("");
 		assertThat(result).isEqualTo(0);
+	}
+
+	@Test
+	void 음수는_더할수없다() {
+		StringCalculator stringCalculator = new StringCalculator(new Splitter());
+		assertThatThrownBy(() -> stringCalculator.add("1,-1"))
+			.isInstanceOf(RuntimeException.class);
 	}
 
 }

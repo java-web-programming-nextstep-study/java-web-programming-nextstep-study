@@ -16,7 +16,17 @@ public class StringCalculator {
 			return ZERO;
 		}
 		List<Integer> numbers = splitter.splitByDefaultDelimiter(target);
+		validateNegative(numbers);
 		return sum(numbers);
+
+	}
+
+	private static void validateNegative(List<Integer> numbers) {
+		boolean existsNegative = numbers.stream()
+			.anyMatch(number -> number < ZERO);
+		if(existsNegative) {
+			throw new RuntimeException();
+		}
 	}
 
 	private int sum(List<Integer> numbers) {
