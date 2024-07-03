@@ -7,11 +7,13 @@ public class StringCalculator {
 	private final Splitter splitter;
 	private static final int ZERO = 0;
 
+
 	public StringCalculator(Splitter splitter) {
 		this.splitter = splitter;
 	}
 
 	public int add(String target) {
+		// if()
 		if(isEmptyOrSpace(target)) {
 			return ZERO;
 		}

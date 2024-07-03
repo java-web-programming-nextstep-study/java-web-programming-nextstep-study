@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class SplitterTest {
 
 	@ParameterizedTest
-	@ValueSource(strings = {"1,2", "1:2"})
+	@ValueSource(strings = {"1,2", "1:2", " 1, 2 "})
 	void 쉼표_또는_콜론으로_문자열을_분리한다(String target) {
 		Splitter splitter = new Splitter();
 		List<Integer> splited = splitter.splitByDefaultDelimiter(target);

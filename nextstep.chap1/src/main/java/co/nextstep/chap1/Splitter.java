@@ -18,6 +18,7 @@ public class Splitter {
 
 	public List<Integer> splitByDelimiter(String delimiter, String target) {
 		return Arrays.stream(target.split(delimiter))
+			.map(String::trim)
 			.map(Integer::parseInt)
 			.collect(Collectors.toList());
 	}
