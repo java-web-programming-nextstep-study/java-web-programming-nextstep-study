@@ -14,4 +14,10 @@ public class Splitter {
 			.map(Integer::parseInt)
 			.collect(Collectors.toList());
 	}
+
+	public List<Integer> splitByDelimiter(String delimiter, String target) {
+		return Arrays.stream(target.split(delimiter))
+			.map(Integer::parseInt)
+			.collect(Collectors.toList());
+	}
 }
