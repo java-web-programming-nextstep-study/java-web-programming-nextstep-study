@@ -1,46 +1,58 @@
 package com.nextstep.calculator;
 
-public class Calculator {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-	int Add(String input) {
+public class Calculator {
+	
+	private static final String DEFAULT_SEPARATOR = "[,:]";
+	private static final String CUSTOM_SEPARATOR_PATTERN = "//(.*)\n(.*)";
+	
+	public int add(String rawStringToCalculate) {
 		int result = 0;
-		if(input.isEmpty() || input.isBlank())
+		if(rawStringToCalculate.isEmpty() || rawStringToCalculate.isBlank())
 		{
-			return result;
+			return 0;
 		}
-		String[] numbers = splitString(input);		
-		for(int i=0; i < numbers.length; i++) 
-		{
-			int number = Integer.parseInt(numbers[i]);
-			if(number < 0) {
-				throw new RuntimeException();
-			}
-			result += number;
-		}
+		String[] numbers = splitString(rawStringToCalculate);		
+		result = addStringNumbers(numbers);
+		
 		return result;
 	}
 	
-	private String[] splitString(String input) 
+	private String[] splitString(String rawStringToCalculate) 
 	{
 		String separator = "";
-		if(input.contains("//") && input.contains("\n")) 
+		Matcher matcher = Pattern.compile(CUSTOM_SEPARATOR_PATTERN).matcher(rawStringToCalculate);
+		if(matcher.find()) 
 		{
-			int startIndex = input.indexOf("//");
-			int endIndex = input.indexOf("\n");
-			separator = input.substring(startIndex + 2, endIndex);
-			input = input.substring(endIndex + 1);
+			separator = matcher.group(1);
+			return matcher.group(2).split(separator);
 		}
 		else 
 		{
-			separator = "[,:]";
+			separator = DEFAULT_SEPARATOR;
 		}
 		
-		return input.split(separator);
+		return rawStringToCalculate.split(separator);
 	}
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	private int addStringNumbers(String[] numbers) {		
+		int result = 0;
+		for(int i=0; i < numbers.length; i++) 
+		{
+			int number = toPositive(numbers[i]);
+			result += number;
+		}
 		
+		return result;
 	}
+	private int toPositive(String stringNumber) {
+		int number = Integer.parseInt(stringNumber);
+		if(number < 0 ) {
+			throw new RuntimeException();
+		}
+		return number;
+	}	
 
 }
