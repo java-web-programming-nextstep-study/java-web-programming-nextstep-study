@@ -1,14 +1,16 @@
 package org.example;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.example.Calculator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CalculatorTest {
     private Calculator cal;
-    @Before
+
+    @BeforeEach
     public void setup(){
         cal = new Calculator();
         System.out.println("Before");
@@ -26,7 +28,7 @@ public class CalculatorTest {
         System.out.println("subtract");
     }
 
-    @After
+    @AfterEach
     public void teardown(){
         System.out.println("teardown");
     }
