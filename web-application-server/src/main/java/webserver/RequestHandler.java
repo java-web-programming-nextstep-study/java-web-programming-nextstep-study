@@ -29,7 +29,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
         	HttpRequest request = new HttpRequest(in);
-        	String url = request.getUrl();
+        	String url = request.getRequestPath();
         	
         	byte[] body = readAllBytesOfFile("./webapp" + url);
 
