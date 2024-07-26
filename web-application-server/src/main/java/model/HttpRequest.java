@@ -86,10 +86,16 @@ public class HttpRequest {
 	}
 
 	private void parseUrl() {
-		if(url != null && url.contains("?")) {
+		if(url != null) {
 			int index = url.indexOf("?");
-			this.requestPath = url.substring(0, index);
-			this.params = url.substring(index+1);
+			if(index == -1) {
+				this.requestPath = url.substring(0, url.length());
+			}
+			else {
+				this.requestPath = url.substring(0, index);
+				this.params = url.substring(index+1);
+
+			}
 		}
 	}
 

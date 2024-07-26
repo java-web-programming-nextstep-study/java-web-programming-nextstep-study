@@ -34,15 +34,14 @@ public class RequestHandler extends Thread {
         	HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
 
-            if(request.getMethod().equals("POST")){
-                userController.saveMember(createUser(request.getBodyKeyValue()));
-                response.response302Header(request.getHost());
-                return;
+            if("/user/create".equals(request.getRequestPath())) {
+                userController.saveMember(request.getMethod(), createUser(request.getBodyKeyValue()));
+                response.response302Header(request.getHost(), "index.html");
+            } else {
+                byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
+                response.response200Header(body.length);
+                response.responseBody(body);
             }
-
-            byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
-        	response.response200Header(body.length);
-        	response.responseBody(body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
