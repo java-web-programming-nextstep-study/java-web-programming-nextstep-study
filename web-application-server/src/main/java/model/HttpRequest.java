@@ -10,10 +10,15 @@ public class HttpRequest {
 	private String method;
 	private String url;
 	private String version;
+	private String requestPath;
+	private String params;
 	
 	public HttpRequest(InputStream in) throws IOException{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		parseRequest(reader);
+		splitUrl();
+		System.out.println("requestpath: " + requestPath);
+		System.out.println("params: " + params);
 	}
 	
 	private void parseRequest(BufferedReader reader) throws IOException {
@@ -32,6 +37,14 @@ public class HttpRequest {
 		}
 	}
 	
+	private void splitUrl() {
+		if(url != null && url.contains("?")) {
+			int index = url.indexOf("?");
+			this.requestPath = url.substring(0, index);
+			this.params = url.substring(index+1);
+		}
+	}
+	
 	public String getMethod() {
         return method;
     }
@@ -42,5 +55,17 @@ public class HttpRequest {
 
     public String getVersion() {
         return version;
+    }
+    
+    public String getRequestPath() {
+    	return requestPath;
+    }
+    
+    public boolean existsParams() {
+    	return params != null;
+    }
+    
+    public String getParams() {
+    	return params;
     }
 }
