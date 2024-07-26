@@ -8,19 +8,19 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.Map;
 
+import controller.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
-import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private UserController userController = new UserController();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -32,16 +32,15 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
         	HttpRequest request = new HttpRequest(in);
-        	String url = request.getUrl();
-        	
-        	Map<String, String> queryString;
-        	if(request.existsParams()) {
-        		queryString = HttpRequestUtils.parseQueryString(request.getParams());
-        		saveUser(createUser(queryString));
-        	}
-        	byte[] body = readAllBytesOfFile("./webapp" + url);
+            HttpResponse response = new HttpResponse(out);
 
-        	HttpResponse response = new HttpResponse(out);
+            if(request.getMethod().equals("POST")){
+                userController.saveMember(createUser(request.getBodyKeyValue()));
+                response.response302Header(request.getHost());
+                return;
+            }
+
+            byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
         	response.response200Header(body.length);
         	response.responseBody(body);
         } catch (IOException e) {
@@ -51,10 +50,6 @@ public class RequestHandler extends Thread {
     
     private User createUser(Map<String, String> queryString) {
     	return new User(queryString.get("userId"), queryString.get("password"), queryString.get("name"), queryString.get("email"));
-    }
-    
-    private void saveUser(User user) {
-		DataBase.addUser(user);
     }
     
     private byte[] readAllBytesOfFile(String url) throws IOException{

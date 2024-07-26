@@ -18,6 +18,11 @@ public class HttpResponse {
         dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
         dos.writeBytes("\r\n");
 	}
+
+	public void response302Header(String host) throws IOException {
+		dos.writeBytes("HTTP/1.1 302 Found \r\n");
+		dos.writeBytes("Location: http://" + host + "/index.html\r\n");
+	}
 	
 	public void responseBody(byte[] body) throws IOException {
         dos.write(body, 0, body.length);
