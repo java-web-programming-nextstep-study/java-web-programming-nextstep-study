@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -37,9 +40,22 @@ public class RequestHandler extends Thread {
             if("/user/create".equals(request.getRequestPath())) {
                 userController.saveMember(request.getMethod(), createUser(request.getBodyKeyValue()));
                 response.response302Header(request.getHost(), "index.html");
-            } else {
+                response.writeNewLine();
+            }
+            else if("/user/login".equals(request.getRequestPath())) {
+                Map<String, String> bodyKeyValue = request.getBodyKeyValue();
+                boolean logined = userController.login(request.getMethod(), bodyKeyValue.get("userId"), bodyKeyValue.get("password"));
+                String url = logined ? "/index.html" : "/user/login_failed.html";
+                byte[] body = readAllBytesOfFile("./webapp" + url);
+                response.response200Header(body.length);
+                response.setCookie(logined);
+                response.writeNewLine();
+                response.responseBody(body);
+            }
+            else {
                 byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
                 response.response200Header(body.length);
+                response.writeNewLine();
                 response.responseBody(body);
             }
         } catch (IOException e) {
