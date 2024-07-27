@@ -15,6 +15,7 @@ public class HttpRequest {
 
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String HOST = "Host";
+	private static final String COOKIE = "Cookie";
 
 	private BufferedReader reader;
 
@@ -133,5 +134,9 @@ public class HttpRequest {
 
 	public boolean existsBody() {
 		return body != null;
+	}
+
+	public String getCookies() {
+		return header.get(COOKIE);
 	}
 }
