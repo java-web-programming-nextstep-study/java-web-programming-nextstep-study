@@ -90,6 +90,12 @@ public class RequestHandler extends Thread {
                 response.writeNewLine();
                 response.responseBody(body);
             }
+            else if("/css/styles.css".equals(request.getRequestPath())) {
+                byte[] body = readAllBytesOfFile("./webapp/css/styles.css");
+                response.responseCssHeader(body.length);
+                response.writeNewLine();
+                response.responseBody(body);
+            }
             else {
                 byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
                 response.response200Header(body.length);

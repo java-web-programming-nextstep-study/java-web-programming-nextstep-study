@@ -34,4 +34,10 @@ public class HttpResponse {
 	public void writeNewLine() throws IOException{
 		dos.writeBytes("\r\n");
 	}
+
+	public void responseCssHeader(int lengthOfBodyContent) throws IOException {
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes("Content-Type: text/css\r\n");
+		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+	}
 }
