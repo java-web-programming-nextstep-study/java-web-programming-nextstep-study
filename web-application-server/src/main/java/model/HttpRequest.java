@@ -101,32 +101,32 @@ public class HttpRequest {
 	}
 
 	public String getMethod() {
-        return method;
-    }
+		return method;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getVersion() {
+		return version;
+	}
 
 	public String getHost() {
 		return header.get(HOST);
 	}
 
-    public String getRequestPath() {
-    	return requestPath;
-    }
+	public String getRequestPath() {
+		return requestPath;
+	}
 
-    public boolean existsParams() {
-    	return params != null;
-    }
+	public boolean existsParams() {
+		return params != null;
+	}
 
-    public Optional<String> getParams() {
-    	return Optional.ofNullable(params);
-    }
+	public Optional<String> getParams() {
+		return Optional.ofNullable(params);
+	}
 
 	public Map<String, String> getBodyKeyValue() {
 		return HttpRequestUtils.parseQueryString(body);
@@ -140,3 +140,4 @@ public class HttpRequest {
 		return header.get(COOKIE);
 	}
 }
+

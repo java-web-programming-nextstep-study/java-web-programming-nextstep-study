@@ -36,7 +36,7 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-        	HttpRequest request = new HttpRequest(in);
+            HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
 
             if("/user/create".equals(request.getRequestPath())) {
@@ -106,12 +106,13 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
-    
+
     private User createUser(Map<String, String> queryString) {
-    	return new User(queryString.get("userId"), queryString.get("password"), queryString.get("name"), queryString.get("email"));
+        return new User(queryString.get("userId"), queryString.get("password"), queryString.get("name"), queryString.get("email"));
     }
-    
+
     private byte[] readAllBytesOfFile(String url) throws IOException{
-    	return Files.readAllBytes(new File(url).toPath());
+        return Files.readAllBytes(new File(url).toPath());
     }
 }
+
