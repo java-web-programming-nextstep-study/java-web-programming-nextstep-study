@@ -122,8 +122,8 @@ public class HttpRequest {
 		return params != null;
 	}
 
-	public Optional<String> getParams() {
-		return Optional.ofNullable(params);
+	public String getParams() {
+		return params;
 	}
 
 	public Map<String, String> getBodyKeyValue() {
@@ -136,6 +136,14 @@ public class HttpRequest {
 
 	public String getCookies() {
 		return header.get(COOKIE);
+	}
+
+	public Map<String, String> getHeader() {
+		return header;
+	}
+
+	public String getBody() {
+		return body;
 	}
 }
 
