@@ -2,11 +2,11 @@ package model;
 
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import util.HttpRequestUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -22,7 +22,7 @@ public class HttpRequestTest {
                 "\r\n" +
                 "name=홍길동&userId=testUser&password=pass123&email=test@example.com";
         //when
-        HttpRequest httpRequest = new HttpRequest(new ByteArrayInputStream(rawRequest.getBytes()));
+        HttpRequest httpRequest = new HttpRequest(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(rawRequest.getBytes()))));
         //then
         assertAll(
                 () -> assertThat(httpRequest.getMethod()).isEqualTo("POST"),
@@ -44,7 +44,7 @@ public class HttpRequestTest {
         String rawRequest = "GET /localhost:8080?name=홍길동&userId=testUser&password=pass123&email=test@example.com HTTP/1.1\r\n" +
                 "\r\n";
         //when
-        HttpRequest httpRequest = new HttpRequest(new ByteArrayInputStream(rawRequest.getBytes()));
+        HttpRequest httpRequest = new HttpRequest(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(rawRequest.getBytes()))));
         //then
         assertAll(
                 () -> assertThat(httpRequest.getMethod()).isEqualTo("GET"),

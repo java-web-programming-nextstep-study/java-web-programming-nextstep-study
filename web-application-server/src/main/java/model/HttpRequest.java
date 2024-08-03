@@ -5,8 +5,6 @@ import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +25,8 @@ public class HttpRequest {
 	Map<String, String> header = new HashMap<>();
 	private String body;
 
-	public HttpRequest(InputStream in) throws IOException{
-		reader = new BufferedReader(new InputStreamReader(in));
+	public HttpRequest(BufferedReader reader) throws IOException{
+		this.reader = reader;
 		parseRequest();
 	}
 
