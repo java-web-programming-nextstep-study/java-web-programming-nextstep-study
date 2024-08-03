@@ -115,4 +115,25 @@ public class UserControllerTest {
                 () -> assertThat(responseDto.getCookieValue()).isEqualTo("logined=false")
         );
     }
+
+    @Test
+    public void 사용자가_로그인_상태라면_사용자_목록을_보여준다() {
+        DataBase.addUser(new User("testUser", "pw", "name", "email@naver.com"));
+        RequestDto requestDto = new RequestDto(
+                "GET",
+                "/user/list",
+                "HTTP/1.1",
+                "/user/list",
+                null,
+                Map.of("Cookie", "logined=true"),
+                null);
+        //when
+        ResponseDto responseDto = sut.run(requestDto);
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getStatusCode()).isEqualTo(200),
+                () -> assertThat(responseDto.getCookieValue()).isEqualTo("logined=true"),
+                () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/user/list.html")
+        );
+    }
 }

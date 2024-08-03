@@ -15,7 +15,8 @@ public class UserController {
             "/user/form.html", this::getUserForm,
             "/user/create", this::saveMember,
             "/user/login.html", this::getLoginForm,
-            "/user/login", this::login
+            "/user/login", this::login,
+            "/user/list", this::getUserList
     );
 
     public ResponseDto run(RequestDto request) {
@@ -24,9 +25,7 @@ public class UserController {
 
     private ResponseDto getUserForm(RequestDto request) {
         if("GET".equals(request.getMethod())){
-            ResponseDto responseDto = new ResponseDto();
-            responseDto.set2xx(200, "./webapp/user/form.html");
-            return responseDto;
+            return createResponse200("./webapp/user/form.html");
         }
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
@@ -45,16 +44,14 @@ public class UserController {
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
-    public ResponseDto getLoginForm(RequestDto request) {
+    private ResponseDto getLoginForm(RequestDto request) {
         if("GET".equals(request.getMethod())){
-            ResponseDto responseDto = new ResponseDto();
-            responseDto.set2xx(200, "./webapp/user/login.html");
-            return responseDto;
+            return createResponse200("./webapp/user/login.html");
         }
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
-    public ResponseDto login(RequestDto request) {
+    private ResponseDto login(RequestDto request) {
         if("POST".equals(request.getMethod())) {
             Map<String, String> queryString = HttpRequestUtils.parseQueryString(request.getBody());
             String userId = queryString.get("userId");
@@ -79,17 +76,13 @@ public class UserController {
         throw new IllegalStateException();
     }
 
-    public boolean login(String method, String userId, String password) {
-        if(!"POST".equals(method)) {
-            throw new IllegalStateException("POST 요청이 아닙니다.");
-        }
-        if(userId != null && password != null) {
-            User user = DataBase.findUserById(userId);
-            if(user != null && user.getPassword().equals(password)) {
-                return true;
+    private ResponseDto getUserList(RequestDto request) {
+        if("GET".equals(request.getMethod())){
+            if(request.getCookieValue() != null && "logined=true".equals(request.getCookieValue())) {
+                return createResponse200WithCookieValue("./webapp/user/list.html", "logined=true");
             }
         }
-        return false;
+        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
     private ResponseDto createResponse200(String resourceUrl) {

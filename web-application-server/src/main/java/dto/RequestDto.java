@@ -16,6 +16,7 @@ public class RequestDto {
     private String params;
     private Map<String, String> header = new HashMap<>();
     private String body;
+    private String cookieValue;
 
     public RequestDto(String method, String url, String version, String requestPath, String params, Map<String, String> header, String body) {
         this.method = method;
@@ -57,5 +58,9 @@ public class RequestDto {
 
     public String getBody() {
         return body;
+    }
+
+    public String getCookieValue() {
+        return header.get("Cookie");
     }
 }
