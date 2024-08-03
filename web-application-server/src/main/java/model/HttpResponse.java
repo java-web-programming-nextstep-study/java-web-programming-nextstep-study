@@ -40,17 +40,15 @@ public class HttpResponse {
         dos.flush();
     }
 
-//	public void setCookie(boolean logined) throws IOException{
-//		dos.writeBytes("Set-Cookie: logined=" + logined + "\r\n");
-//	}
-
-	public void writeNewLine() throws IOException{
+	private void writeNewLine() throws IOException{
 		dos.writeBytes("\r\n");
 	}
 
-	public void responseCssHeader(int lengthOfBodyContent) throws IOException {
+	public void responseCss(byte[] body, int lengthOfBodyContent) throws IOException {
 		dos.writeBytes("HTTP/1.1 200 OK \r\n");
 		dos.writeBytes("Content-Type: text/css\r\n");
 		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+		writeNewLine();
+		responseBody(body);
 	}
 }
