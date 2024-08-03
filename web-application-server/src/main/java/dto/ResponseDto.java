@@ -5,6 +5,7 @@ public class ResponseDto {
     private int statusCode;
     private String resourceUrl;
     private String location;
+    private String cookieValue;
 
     public ResponseDto() {
     }
@@ -42,5 +43,17 @@ public class ResponseDto {
 
     public String getLocation() {
         return location;
+    }
+
+    public boolean existsCookieValue() {
+        return cookieValue != null;
+    }
+
+    public String getCookieValue() {
+        return cookieValue;
+    }
+
+    public void setCookieValue(String cookieValue) {
+        this.cookieValue = cookieValue;
     }
 }

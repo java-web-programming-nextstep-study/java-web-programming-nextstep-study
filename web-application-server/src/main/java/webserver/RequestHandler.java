@@ -41,23 +41,17 @@ public class RequestHandler extends Thread {
 
                 if(responseDto.getStatusCode() == 200) {
                     byte[] body = readAllBytesOfFile(responseDto.getResourceUrl());
-                    response.response200(body);
+                    if(responseDto.existsCookieValue()) {
+                        response.response200WithCookie(body, responseDto.getCookieValue());
+                    }
+                    else {
+                        response.response200(body);
+                    }
                 }
                 if(responseDto.getStatusCode() == 302) {
                     response.response302(request.getHost(), responseDto.getLocation());
                 }
             }
-
-//            else if("/user/login".equals(request.getRequestPath())) {
-//                Map<String, String> bodyKeyValue = request.getBodyKeyValue();
-//                boolean logined = userController.login(request.getMethod(), bodyKeyValue.get("userId"), bodyKeyValue.get("password"));
-//                String url = logined ? "/index.html" : "/user/login_failed.html";
-//                byte[] body = readAllBytesOfFile("./webapp" + url);
-//                response.response200Header(body.length);
-//                response.setCookie(logined);
-//                response.writeNewLine();
-//                response.responseBody(body);
-//            }
 //            else if("/user/list".equals(request.getRequestPath())) {
 //                Map<String, String> cookies = HttpRequestUtils.parseCookies(request.getCookies());
 //                String url;
@@ -107,10 +101,6 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    private User createUser(Map<String, String> queryString) {
-        return new User(queryString.get("userId"), queryString.get("password"), queryString.get("name"), queryString.get("email"));
     }
 
     private byte[] readAllBytesOfFile(String url) throws IOException{

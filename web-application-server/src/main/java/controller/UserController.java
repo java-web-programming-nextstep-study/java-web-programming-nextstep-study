@@ -11,9 +11,11 @@ import java.util.function.Function;
 
 public class UserController {
 
-    private Map<String, Function<RequestDto, ResponseDto>> path = Map.of(
+    private final Map<String, Function<RequestDto, ResponseDto>> path = Map.of(
             "/user/form.html", this::getUserForm,
-            "/user/create", this::saveMember
+            "/user/create", this::saveMember,
+            "/user/login.html", this::getLoginForm,
+            "/user/login", this::login
     );
 
     public ResponseDto run(RequestDto request) {
@@ -21,29 +23,60 @@ public class UserController {
     }
 
     private ResponseDto getUserForm(RequestDto request) {
-        ResponseDto responseDto = new ResponseDto();
-        responseDto.set2xx(200, "./webapp/user/form.html");
-        return responseDto;
+        if("GET".equals(request.getMethod())){
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.set2xx(200, "./webapp/user/form.html");
+            return responseDto;
+        }
+        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
     private ResponseDto saveMember(RequestDto request) {
-        Map<String, String> bodyKeyValue = HttpRequestUtils.parseQueryString(request.getBody());
+        if("POST".equals(request.getMethod())){
+            Map<String, String> bodyKeyValue = HttpRequestUtils.parseQueryString(request.getBody());
 
-        User user = new User(bodyKeyValue.get("userId"), bodyKeyValue.get("password"), bodyKeyValue.get("name"), bodyKeyValue.get("email"));
-        DataBase.addUser(user);
+            User user = new User(bodyKeyValue.get("userId"), bodyKeyValue.get("password"), bodyKeyValue.get("name"), bodyKeyValue.get("email"));
+            DataBase.addUser(user);
 
-        ResponseDto responseDto = new ResponseDto();
-        responseDto.set3xx(302, "/index.html");
-        return responseDto;
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.set3xx(302, "/index.html");
+            return responseDto;
+        }
+        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
-    private void saveMember(String method, User user) {
-        if(!"POST".equals(method)) {
-            throw new IllegalStateException("POST 요청이 아닙니다.");
+    public ResponseDto getLoginForm(RequestDto request) {
+        if("GET".equals(request.getMethod())){
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.set2xx(200, "./webapp/user/login.html");
+            return responseDto;
         }
-        if(user != null) {
-            DataBase.addUser(user);
+        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
+    }
+
+    public ResponseDto login(RequestDto request) {
+        if("POST".equals(request.getMethod())) {
+            Map<String, String> queryString = HttpRequestUtils.parseQueryString(request.getBody());
+            String userId = queryString.get("userId");
+            String password = queryString.get("password");
+
+            return processLogin(userId, password);
         }
+        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
+    }
+
+    private ResponseDto processLogin(String userId, String password) {
+        if(userId != null && password != null) {
+            User user = DataBase.findUserById(userId);
+
+            if(user != null && user.getPassword().equals(password)) {
+                return createResponse200WithCookieValue("./webapp/index.html", "logined=true");
+            }
+            else {
+                return createResponse200WithCookieValue("./webapp/user/login_failed.html", "logined=false");
+            }
+        }
+        throw new IllegalStateException();
     }
 
     public boolean login(String method, String userId, String password) {
@@ -57,6 +90,19 @@ public class UserController {
             }
         }
         return false;
+    }
+
+    private ResponseDto createResponse200(String resourceUrl) {
+        ResponseDto responseDto = new ResponseDto();
+        responseDto.set2xx(200, resourceUrl);
+        return responseDto;
+    }
+
+    private ResponseDto createResponse200WithCookieValue(String resourceUrl, String cookieValue) {
+        ResponseDto responseDto = new ResponseDto();
+        responseDto.set2xx(200, resourceUrl);
+        responseDto.setCookieValue(cookieValue);
+        return responseDto;
     }
 
 

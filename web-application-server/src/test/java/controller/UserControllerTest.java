@@ -1,7 +1,9 @@
 package controller;
 
+import db.DataBase;
 import dto.RequestDto;
 import dto.ResponseDto;
+import model.User;
 import org.junit.Test;
 
 import java.util.Map;
@@ -48,7 +50,69 @@ public class UserControllerTest {
         ResponseDto responseDto = sut.run(requestDto);
         //then
         assertAll(
-                () -> assertThat(responseDto.getStatusCode()).isEqualTo(302)
+                () -> assertThat(responseDto.getStatusCode()).isEqualTo(302),
+                () -> assertThat(responseDto.getLocation()).isEqualTo("/index.html")
+        );
+    }
+
+    @Test
+    public void GET메서드로_회원가입을_할수없다() {
+        //given
+        RequestDto requestDto = new RequestDto(
+                "GET",
+                "/user/create",
+                "HTTP/1.1",
+                "/user/create",
+                null,
+                null,
+                "userId=aa&password=bb&name=cc&email=aaaa@naver.com");
+        //then
+        assertThatThrownBy(() -> sut.run(requestDto))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("HTTP 메서드를 지원하지 않습니다.");
+    }
+
+    @Test
+    public void 로그인이_성공한다() {
+        //given
+        DataBase.addUser(new User("testUser", "pw", "name", "email@naver.com"));
+        RequestDto requestDto = new RequestDto(
+                "POST",
+                "/user/login",
+                "HTTP/1.1",
+                "/user/login",
+                null,
+                null,
+                "userId=testUser&password=pw");
+        //when
+        ResponseDto responseDto = sut.run(requestDto);
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getStatusCode()).isEqualTo(200),
+                () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/index.html"),
+                () -> assertThat(responseDto.getCookieValue()).isEqualTo("logined=true")
+        );
+    }
+
+    @Test
+    public void 로그인이_실패한다() {
+        //given
+        DataBase.addUser(new User("testUser", "pw", "name", "email@naver.com"));
+        RequestDto requestDto = new RequestDto(
+                "POST",
+                "/user/login",
+                "HTTP/1.1",
+                "/user/login",
+                null,
+                null,
+                "userId=aa&password=aa");
+        //when
+        ResponseDto responseDto = sut.run(requestDto);
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getStatusCode()).isEqualTo(200),
+                () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/user/login_failed.html"),
+                () -> assertThat(responseDto.getCookieValue()).isEqualTo("logined=false")
         );
     }
 }

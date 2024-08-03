@@ -20,6 +20,15 @@ public class HttpResponse {
 		responseBody(body);
 	}
 
+	public void response200WithCookie(byte[] body, String cookieValue) throws IOException {
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+		dos.writeBytes("Content-Length: " + body.length + "\r\n");
+		dos.writeBytes("Set-Cookie: " + cookieValue + "\r\n");
+		writeNewLine();
+		responseBody(body);
+	}
+
 	public void response302(String host, String redirectUrl) throws IOException{
 		dos.writeBytes("HTTP/1.1 302 Found \r\n");
 		dos.writeBytes("Location: http://" + host + "/" + redirectUrl +"\r\n");
@@ -31,9 +40,9 @@ public class HttpResponse {
         dos.flush();
     }
 
-	public void setCookie(boolean logined) throws IOException{
-		dos.writeBytes("Set-Cookie: logined=" + logined + "\r\n");
-	}
+//	public void setCookie(boolean logined) throws IOException{
+//		dos.writeBytes("Set-Cookie: logined=" + logined + "\r\n");
+//	}
 
 	public void writeNewLine() throws IOException{
 		dos.writeBytes("\r\n");
