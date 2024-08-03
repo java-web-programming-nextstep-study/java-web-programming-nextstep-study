@@ -7,13 +7,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class HttpRequest {
 
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String HOST = "Host";
-	private static final String COOKIE = "Cookie";
 
 	private BufferedReader reader;
 
@@ -85,7 +83,6 @@ public class HttpRequest {
 	}
 
 	private void parseUrl() {
-		System.out.println("url: " + url);
 		if(url != null) {
 			int index = url.indexOf("?");
 			if(index == -1) {
@@ -94,7 +91,6 @@ public class HttpRequest {
 			else {
 				this.requestPath = url.substring(0, index);
 				this.params = url.substring(index+1);
-
 			}
 		}
 	}
@@ -129,14 +125,6 @@ public class HttpRequest {
 
 	public Map<String, String> getBodyKeyValue() {
 		return HttpRequestUtils.parseQueryString(body);
-	}
-
-	public boolean existsBody() {
-		return body != null;
-	}
-
-	public String getCookies() {
-		return header.get(COOKIE);
 	}
 
 	public Map<String, String> getHeader() {

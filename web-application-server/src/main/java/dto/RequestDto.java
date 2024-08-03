@@ -5,7 +5,6 @@ import model.HttpRequest;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class RequestDto {
 
@@ -16,7 +15,6 @@ public class RequestDto {
     private String params;
     private Map<String, String> header = new HashMap<>();
     private String body;
-    private String cookieValue;
 
     public RequestDto(String method, String url, String version, String requestPath, String params, Map<String, String> header, String body) {
         this.method = method;
