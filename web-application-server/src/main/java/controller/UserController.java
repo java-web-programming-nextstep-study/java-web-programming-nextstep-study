@@ -79,8 +79,9 @@ public class UserController {
     private ResponseDto getUserList(RequestDto request) {
         if("GET".equals(request.getMethod())){
             if(request.getCookieValue() != null && "logined=true".equals(request.getCookieValue())) {
-                return createResponse200WithCookieValue("./webapp/user/list.html", "logined=true");
+                return createResponse200("./webapp/user/list.html");
             }
+            return createResponse200("./webapp/user/login.html");
         }
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }

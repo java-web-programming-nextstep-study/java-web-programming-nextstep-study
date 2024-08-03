@@ -118,7 +118,6 @@ public class UserControllerTest {
 
     @Test
     public void 사용자가_로그인_상태라면_사용자_목록을_보여준다() {
-        DataBase.addUser(new User("testUser", "pw", "name", "email@naver.com"));
         RequestDto requestDto = new RequestDto(
                 "GET",
                 "/user/list",
@@ -132,8 +131,26 @@ public class UserControllerTest {
         //then
         assertAll(
                 () -> assertThat(responseDto.getStatusCode()).isEqualTo(200),
-                () -> assertThat(responseDto.getCookieValue()).isEqualTo("logined=true"),
                 () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/user/list.html")
+        );
+    }
+
+    @Test
+    public void 사용자가_로그인_상태가_아니라면_로그인_페이지를_보여준다() {
+        RequestDto requestDto = new RequestDto(
+                "GET",
+                "/user/list",
+                "HTTP/1.1",
+                "/user/list",
+                null,
+                Map.of("Cookie", "logined=false"),
+                null);
+        //when
+        ResponseDto responseDto = sut.run(requestDto);
+        //then
+        assertAll(
+                () -> assertThat(responseDto.getStatusCode()).isEqualTo(200),
+                () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/user/login.html")
         );
     }
 }
