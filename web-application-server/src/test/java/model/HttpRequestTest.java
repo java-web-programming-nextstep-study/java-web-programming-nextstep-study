@@ -51,7 +51,7 @@ public class HttpRequestTest {
                 () -> assertThat(httpRequest.getUrl()).isEqualTo("/localhost:8080?name=홍길동&userId=testUser&password=pass123&email=test@example.com"),
                 () -> assertThat(httpRequest.getVersion()).isEqualTo("HTTP/1.1"),
                 () -> {
-                    Map<String, String> params = HttpRequestUtils.parseQueryString(httpRequest.getParams().get());
+                    Map<String, String> params = HttpRequestUtils.parseQueryString(httpRequest.getParams());
                     assertThat(params.get("name")).isEqualTo("홍길동");
                     assertThat(params.get("userId")).isEqualTo("testUser");
                     assertThat(params.get("password")).isEqualTo("pass123");

@@ -22,7 +22,7 @@ public class UserController {
 
     private ResponseDto getUserForm(RequestDto request) {
         ResponseDto responseDto = new ResponseDto();
-        responseDto.set2xx(200, "./user/form.html");
+        responseDto.set2xx(200, "./webapp/user/form.html");
         return responseDto;
     }
 
@@ -33,11 +33,11 @@ public class UserController {
         DataBase.addUser(user);
 
         ResponseDto responseDto = new ResponseDto();
-        responseDto.set3xx(302, "./index.html");
+        responseDto.set3xx(302, "/index.html");
         return responseDto;
     }
 
-    public void saveMember(String method, User user) {
+    private void saveMember(String method, User user) {
         if(!"POST".equals(method)) {
             throw new IllegalStateException("POST 요청이 아닙니다.");
         }

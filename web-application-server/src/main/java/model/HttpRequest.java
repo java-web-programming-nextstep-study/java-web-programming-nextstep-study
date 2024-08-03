@@ -85,6 +85,7 @@ public class HttpRequest {
 	}
 
 	private void parseUrl() {
+		System.out.println("url: " + url);
 		if(url != null) {
 			int index = url.indexOf("?");
 			if(index == -1) {

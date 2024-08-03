@@ -40,7 +40,7 @@ public class RequestHandler extends Thread {
                 ResponseDto responseDto = userController.run(RequestDto.toDto(request));
 
                 if(responseDto.getStatusCode() == 200) {
-                    byte[] body = readAllBytesOfFile("./webapp" + request.getUrl());
+                    byte[] body = readAllBytesOfFile(responseDto.getResourceUrl());
                     response.response200(body);
                 }
                 if(responseDto.getStatusCode() == 302) {
@@ -48,11 +48,6 @@ public class RequestHandler extends Thread {
                 }
             }
 
-//            if("/user/create".equals(request.getRequestPath())) {
-//                userController.saveMember(request.getMethod(), createUser(request.getBodyKeyValue()));
-//                response.response302Header(request.getHost(), "index.html");
-//                response.writeNewLine();
-//            }
 //            else if("/user/login".equals(request.getRequestPath())) {
 //                Map<String, String> bodyKeyValue = request.getBodyKeyValue();
 //                boolean logined = userController.login(request.getMethod(), bodyKeyValue.get("userId"), bodyKeyValue.get("password"));
