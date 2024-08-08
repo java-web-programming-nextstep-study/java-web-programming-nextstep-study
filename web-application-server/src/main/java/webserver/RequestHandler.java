@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import controller.UserController;
 import dto.RequestDto;
 import dto.ResponseDto;
+import facade.ExceptionFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ public class RequestHandler extends Thread {
 
     private Socket connection;
     private UserController userController = new UserController();
+    private ExceptionFacade exceptionFacade = new ExceptionFacade(userController);
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -35,7 +37,7 @@ public class RequestHandler extends Thread {
             HttpResponse response = new HttpResponse(dos);
 
             if(request.getRequestPath().startsWith("/user")){
-                ResponseDto responseDto = userController.run(RequestDto.toDto(request));
+                ResponseDto responseDto = exceptionFacade.run(RequestDto.toDto(request));
 
                 if(responseDto.getStatusCode() == 200) {
                     byte[] body = readAllBytesOfFile(responseDto.getResourceUrl());
@@ -49,6 +51,13 @@ public class RequestHandler extends Thread {
                 if(responseDto.getStatusCode() == 302) {
                     response.response302(request.getHost(), responseDto.getLocation());
                 }
+                if(responseDto.getStatusCode() == 400) {
+                    response.response400(responseDto.getExceptionMessage());
+                }
+                if (responseDto.getStatusCode() == 500) {
+                    response.response500(responseDto.getExceptionMessage());
+                }
+
             }
             else if(request.getRequestPath().endsWith(".css")) {
                 byte[] body = readAllBytesOfFile("./webapp/" + request.getRequestPath());

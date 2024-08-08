@@ -6,6 +6,7 @@ public class ResponseDto {
     private String resourceUrl;
     private String location;
     private String cookieValue;
+    private String exceptionMessage;
 
     public ResponseDto() {
     }
@@ -33,6 +34,11 @@ public class ResponseDto {
         this.location = location;
     }
 
+    public void setException(int statusCode, String exceptionMessage) {
+        this.statusCode = statusCode;
+        this.exceptionMessage = exceptionMessage;
+    }
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -55,5 +61,9 @@ public class ResponseDto {
 
     public void setCookieValue(String cookieValue) {
         this.cookieValue = cookieValue;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
     }
 }
