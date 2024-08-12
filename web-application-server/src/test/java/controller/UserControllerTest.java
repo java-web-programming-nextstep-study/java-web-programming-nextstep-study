@@ -153,4 +153,5 @@ public class UserControllerTest {
                 () -> assertThat(responseDto.getResourceUrl()).isEqualTo("./webapp/user/login.html")
         );
     }
+
 }
