@@ -12,11 +12,11 @@ public class RequestDto {
     private String url;
     private String version;
     private String requestPath;
-    private String params;
+    private Map<String, String> params = new HashMap<>();
     private Map<String, String> header = new HashMap<>();
     private String body;
 
-    public RequestDto(String method, String url, String version, String requestPath, String params, Map<String, String> header, String body) {
+    public RequestDto(String method, String url, String version, String requestPath, Map<String, String> params ,Map<String, String> header, String body) {
         this.method = method;
         this.url = url;
         this.version = version;
@@ -46,7 +46,7 @@ public class RequestDto {
         return requestPath;
     }
 
-    public String getParams() {
+    public Map<String, String> getParams() {
         return params;
     }
 

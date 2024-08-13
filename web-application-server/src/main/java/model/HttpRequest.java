@@ -12,6 +12,8 @@ public class HttpRequest {
 
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String HOST = "Host";
+	private static final String CONTENT_TYPE = "Content-Type";
+	private static final String X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
 	private BufferedReader reader;
 
@@ -19,40 +21,37 @@ public class HttpRequest {
 	private String url;
 	private String version;
 	private String requestPath;
-	private String params;
-	Map<String, String> header = new HashMap<>();
+	private Map<String, String> params = new HashMap<>();
+	private Map<String, String> header = new HashMap<>();
 	private String body;
 
 	public HttpRequest(BufferedReader reader) throws IOException{
 		this.reader = reader;
-		parseRequest();
-	}
 
-	private void parseRequest() throws IOException {
 		parseStartLine();
-		parseUrl();
 		parseHeaders();
+		parseUrl();
 		parseBody();
 	}
 
 	private void parseBody() throws IOException {
 		if(header.containsKey(CONTENT_LENGTH)){
-			int contentLength = getContentLength();
+			int contentLength = Integer.parseInt(header.get(CONTENT_LENGTH));
 			if(contentLength > 0) {
 				body = IOUtils.readData(reader, contentLength);
+
+				if(header.containsKey(CONTENT_TYPE) && header.containsValue(X_WWW_FORM_URLENCODED)) {
+					this.params.putAll(HttpRequestUtils.parseQueryString(body));
+				}
 			}
 		}
-	}
-
-	private int getContentLength() {
-		return Integer.parseInt(header.get(CONTENT_LENGTH));
 	}
 
 	private void parseHeaders() throws IOException {
 		String line;
 		while ((line = reader.readLine()) != null && !line.isEmpty()) {
-			validateLineNull(line);
-			parseHeaders(line);
+			HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
+			header.put(pair.getKey(), pair.getValue());
 		}
 	}
 
@@ -64,16 +63,6 @@ public class HttpRequest {
 		this.method = tokens[0];
 		this.url = tokens[1];
 		this.version = tokens[2];
-	}
-
-	private void parseHeaders(String line) {
-		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(line);
-		addHeader(pair.getKey(), pair.getValue());
-	}
-
-
-	private void addHeader(String key, String value) {
-		header.put(key, value);
 	}
 
 	private void validateLineNull(String line) {
@@ -90,7 +79,9 @@ public class HttpRequest {
 			}
 			else {
 				this.requestPath = url.substring(0, index);
-				this.params = url.substring(index+1);
+
+				Map<String, String> queryString = HttpRequestUtils.parseQueryString(url.substring(index + 1));
+                this.params.putAll(queryString);
 			}
 		}
 	}
@@ -107,24 +98,20 @@ public class HttpRequest {
 		return version;
 	}
 
-	public String getHost() {
-		return header.get(HOST);
-	}
-
 	public String getRequestPath() {
 		return requestPath;
 	}
 
-	public boolean existsParams() {
-		return params != null;
+	public String getParams(String key) {
+		return this.params.get(key);
 	}
 
-	public String getParams() {
-		return params;
+	public Map<String, String> getParams() {
+		return this.params;
 	}
 
-	public Map<String, String> getBodyKeyValue() {
-		return HttpRequestUtils.parseQueryString(body);
+	public String getHeader(String key) {
+		return this.header.get(key);
 	}
 
 	public Map<String, String> getHeader() {

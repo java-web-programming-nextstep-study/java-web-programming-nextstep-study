@@ -49,7 +49,7 @@ public class RequestHandler extends Thread {
                     }
                 }
                 if(responseDto.getStatusCode() == 302) {
-                    response.response302(request.getHost(), responseDto.getLocation());
+                    response.response302(request.getHeader("Host"), responseDto.getLocation());
                 }
                 if(responseDto.getStatusCode() == 400) {
                     response.response400(responseDto.getExceptionMessage());

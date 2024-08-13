@@ -1,11 +1,6 @@
 package model;
 
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import util.HttpRequestUtils;
-
 import java.io.*;
 import java.util.Map;
 
@@ -15,10 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HttpRequestTest {
 
     @Test
-    public void 바디가_존재하는_POST_파싱_테스트() throws IOException {
+    public void 쿼리스트링과_X_WWW_FORM_URLENCODED_타입의_바디가_존재하는_POST_파싱_테스트() throws IOException {
         //given
-        String rawRequest = "POST /localhost:8080 HTTP/1.1\r\n" +
+        String rawRequest = "POST /localhost:8080?test=1 HTTP/1.1\r\n" +
                 "Content-Length: 68\r\n" +
+                "Content-Type: application/x-www-form-urlencoded\r\n" +
                 "\r\n" +
                 "name=홍길동&userId=testUser&password=pass123&email=test@example.com";
         //when
@@ -26,14 +22,14 @@ public class HttpRequestTest {
         //then
         assertAll(
                 () -> assertThat(httpRequest.getMethod()).isEqualTo("POST"),
-                () -> assertThat(httpRequest.getUrl()).isEqualTo("/localhost:8080"),
+                () -> assertThat(httpRequest.getRequestPath()).isEqualTo("/localhost:8080"),
                 () -> assertThat(httpRequest.getVersion()).isEqualTo("HTTP/1.1"),
                 () -> {
-                    Map<String, String> bodyKeyValue = httpRequest.getBodyKeyValue();
-                    assertThat(bodyKeyValue.get("name")).isEqualTo("홍길동");
-                    assertThat(bodyKeyValue.get("userId")).isEqualTo("testUser");
-                    assertThat(bodyKeyValue.get("password")).isEqualTo("pass123");
-                    assertThat(bodyKeyValue.get("email")).isEqualTo("test@example.com");
+                    assertThat(httpRequest.getParams("test")).isEqualTo("1");
+                    assertThat(httpRequest.getParams("name")).isEqualTo("홍길동");
+                    assertThat(httpRequest.getParams("userId")).isEqualTo("testUser");
+                    assertThat(httpRequest.getParams("password")).isEqualTo("pass123");
+                    assertThat(httpRequest.getParams("email")).isEqualTo("test@example.com");
                 }
         );
     }
@@ -51,11 +47,10 @@ public class HttpRequestTest {
                 () -> assertThat(httpRequest.getUrl()).isEqualTo("/localhost:8080?name=홍길동&userId=testUser&password=pass123&email=test@example.com"),
                 () -> assertThat(httpRequest.getVersion()).isEqualTo("HTTP/1.1"),
                 () -> {
-                    Map<String, String> params = HttpRequestUtils.parseQueryString(httpRequest.getParams());
-                    assertThat(params.get("name")).isEqualTo("홍길동");
-                    assertThat(params.get("userId")).isEqualTo("testUser");
-                    assertThat(params.get("password")).isEqualTo("pass123");
-                    assertThat(params.get("email")).isEqualTo("test@example.com");
+                    assertThat(httpRequest.getParams("name")).isEqualTo("홍길동");
+                    assertThat(httpRequest.getParams("userId")).isEqualTo("testUser");
+                    assertThat(httpRequest.getParams("password")).isEqualTo("pass123");
+                    assertThat(httpRequest.getParams("email")).isEqualTo("test@example.com");
                 }
         );
     }
