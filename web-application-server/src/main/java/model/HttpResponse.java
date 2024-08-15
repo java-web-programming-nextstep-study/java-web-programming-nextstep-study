@@ -1,15 +1,22 @@
 package model;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpResponse {
 	
 	private DataOutputStream dos;
-	
-	public HttpResponse(OutputStream out) {
-		dos = new DataOutputStream(out);
+	private Map<String, String> headers = new HashMap<>();
+
+	public HttpResponse(DataOutputStream dos) {
+		this.dos = dos;
 	}
 	
 	public void response200(byte[] body) throws IOException {
@@ -90,5 +97,35 @@ public class HttpResponse {
 		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 		writeNewLine();
 		responseBody(body);
+	}
+
+	public void forward(String url) throws IOException {
+		byte[] fileBytes = Files.readAllBytes(Paths.get(url));
+
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+		dos.writeBytes("Content-Length: " + fileBytes.length + "\r\n");
+		addHeaders();
+		writeNewLine();
+		responseBody(fileBytes);
+	}
+
+	public void sendRedirect(String locationUrl) throws IOException{
+		dos.writeBytes("HTTP/1.1 302 Found \r\n");
+		dos.writeBytes("Location: http://" + locationUrl +"\r\n");
+		addHeaders();
+		writeNewLine();
+		dos.flush();
+	}
+
+
+	public void addHeader(String key, String value) {
+		headers.put(key, value);
+	}
+
+	private void addHeaders() throws IOException {
+		for (String key : headers.keySet()) {
+			dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
+		}
 	}
 }

@@ -3,13 +3,18 @@ package controller;
 import db.DataBase;
 import dto.RequestDto;
 import dto.ResponseDto;
+import model.HttpRequest;
+import model.HttpResponse;
 import model.User;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class UserController {
+public class UserController extends AbstractController{
 
     private final Map<String, Function<RequestDto, ResponseDto>> path = Map.of(
             "/user/form.html", this::getUserForm,
@@ -19,9 +24,31 @@ public class UserController {
             "/user/list", this::getUserList
     );
 
+//    private final Map<String, BiConsumer<HttpRequest, HttpResponse>> getPath = Map.of(
+//            "/user/form.html", this::getUserForm,
+//            "/user/login.html", this::getLoginForm,
+//            "/user/list", this::getUserList
+//    );
+
+    @Override
+    protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+
+    }
+
+    @Override
+    protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+
+    }
+
     public ResponseDto run(RequestDto request) {
         return path.get(request.getRequestPath()).apply(request);
     }
+
+    private void getUserForm(HttpRequest request, HttpResponse response) {
+//        response.response200();
+        createResponse200("./webapp/user/form.html");
+    }
+
 
     private ResponseDto getUserForm(RequestDto request) {
         if("GET".equals(request.getMethod())){
@@ -86,6 +113,7 @@ public class UserController {
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
+
     private ResponseDto createResponse200(String resourceUrl) {
         ResponseDto responseDto = new ResponseDto();
         responseDto.set2xx(200, resourceUrl);
@@ -98,7 +126,4 @@ public class UserController {
         responseDto.setCookieValue(cookieValue);
         return responseDto;
     }
-
-
-
 }

@@ -45,16 +45,16 @@ public class RequestHandler extends Thread {
                         response.response200WithCookie(body, responseDto.getCookieValue());
                     }
                     else {
-                        response.response200(body);
+                        response.forward(responseDto.getResourceUrl());
                     }
                 }
-                if(responseDto.getStatusCode() == 302) {
-                    response.response302(request.getHeader("Host"), responseDto.getLocation());
+                else if(responseDto.getStatusCode() == 302) {
+                    response.sendRedirect(request.getHeader("Host") + "/" + responseDto.getLocation());
                 }
-                if(responseDto.getStatusCode() == 400) {
+                else if(responseDto.getStatusCode() == 400) {
                     response.response400(responseDto.getExceptionMessage());
                 }
-                if (responseDto.getStatusCode() == 500) {
+                else if (responseDto.getStatusCode() == 500) {
                     response.response500(responseDto.getExceptionMessage());
                 }
 
