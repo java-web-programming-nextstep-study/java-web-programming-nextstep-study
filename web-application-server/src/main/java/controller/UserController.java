@@ -9,6 +9,7 @@ import model.User;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -16,37 +17,47 @@ import java.util.function.Function;
 
 public class UserController extends AbstractController{
 
-    private final Map<String, Function<RequestDto, ResponseDto>> path = Map.of(
-            "/user/form.html", this::getUserForm,
-            "/user/create", this::saveMember,
-            "/user/login.html", this::getLoginForm,
-            "/user/login", this::login,
-            "/user/list", this::getUserList
+    private final Map<String, BiConsumer<HttpRequest, HttpResponse>> getPath = Map.of(
+            "/user/form.html", this.wrap(this::getUserForm),
+            "/user/login.html", this.wrap(this::getLoginForm),
+            "/user/list", this.wrap(this::getUserList)
     );
 
-//    private final Map<String, BiConsumer<HttpRequest, HttpResponse>> getPath = Map.of(
-//            "/user/form.html", this::getUserForm,
-//            "/user/login.html", this::getLoginForm,
-//            "/user/list", this::getUserList
-//    );
+    private final Map<String, BiConsumer<HttpRequest, HttpResponse>> postPath = Map.of(
+            "/user/create", this.wrap(this::saveMember),
+            "/user/login", this.wrap(this::login)
+            );
+
+
+    private BiConsumer<HttpRequest, HttpResponse> wrap(BiConsumerWithIOException<HttpRequest, HttpResponse> consumer) {
+        return (request, response) -> {
+            try {
+                consumer.accept(request, response);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    @FunctionalInterface
+    private interface BiConsumerWithIOException<T, U> {
+        void accept(T t, U u) throws IOException;
+    }
 
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-
+        BiConsumer<HttpRequest, HttpResponse> biConsumer = this.getPath.get(httpRequest.getRequestPath());
+        biConsumer.accept(httpRequest, httpResponse);
     }
 
     @Override
     protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-
+        BiConsumer<HttpRequest, HttpResponse> biConsumer = this.postPath.get(httpRequest.getRequestPath());
+        biConsumer.accept(httpRequest, httpResponse);
     }
 
-    public ResponseDto run(RequestDto request) {
-        return path.get(request.getRequestPath()).apply(request);
-    }
-
-    private void getUserForm(HttpRequest request, HttpResponse response) {
-//        response.response200();
-        createResponse200("./webapp/user/form.html");
+    private void getUserForm(HttpRequest request, HttpResponse response) throws IOException {
+        response.forward("./webapp/user/form.html");
     }
 
 
@@ -71,46 +82,46 @@ public class UserController extends AbstractController{
         throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
     }
 
-    private ResponseDto getLoginForm(RequestDto request) {
-        if("GET".equals(request.getMethod())){
-            return createResponse200("./webapp/user/login.html");
-        }
-        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
+    private void saveMember(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+            User user = new User(httpRequest.getParams("userId"), httpRequest.getParams("password"), httpRequest.getParams("name"), httpRequest.getParams("email"));
+            DataBase.addUser(user);
+
+            httpResponse.sendRedirect(httpRequest.getParams("Host"), "index.html");
     }
 
-    private ResponseDto login(RequestDto request) {
-        if("POST".equals(request.getMethod())) {
-            Map<String, String> queryString = HttpRequestUtils.parseQueryString(request.getBody());
-            String userId = queryString.get("userId");
-            String password = queryString.get("password");
-
-            return processLogin(userId, password);
-        }
-        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
+    private void getLoginForm(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        httpResponse.forward("./webapp/user/login.html");
     }
 
-    private ResponseDto processLogin(String userId, String password) {
-        if(userId != null && password != null) {
+
+    private void login(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+            String userId = httpRequest.getParams("userId");
+            String password = httpRequest.getParams("password");
+
+            processLogin(httpResponse, userId, password);
+    }
+
+    private void processLogin(HttpResponse httpResponse, String userId, String password) throws IOException {
+        if (userId != null && password != null) {
             User user = DataBase.findUserById(userId);
 
-            if(user != null && user.getPassword().equals(password)) {
-                return createResponse200WithCookieValue("./webapp/index.html", "logined=true");
-            }
-            else {
-                return createResponse200WithCookieValue("./webapp/user/login_failed.html", "logined=false");
+            if (user != null && user.getPassword().equals(password)) {
+                httpResponse.addHeader("Set-Cookie", "logined=true");
+                httpResponse.forward("./webapp/index.html");
+            } else {
+                httpResponse.addHeader("Set-Cookie", "logined=false");
+                httpResponse.forward("./webapp/user/login_failed.html");
             }
         }
-        throw new IllegalStateException();
     }
 
-    private ResponseDto getUserList(RequestDto request) {
-        if("GET".equals(request.getMethod())){
-            if(request.getCookieValue() != null && "logined=true".equals(request.getCookieValue())) {
-                return createResponse200("./webapp/user/list.html");
+    private void getUserList(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        if (httpRequest.getHeader("Cookie") != null) {
+            if("logined=true".equals(httpRequest.getHeader("Cookie"))) {
+                httpResponse.forward("./webapp/user/list.html");
             }
-            return createResponse200("./webapp/user/login.html");
         }
-        throw new IllegalStateException("HTTP 메서드를 지원하지 않습니다.");
+        httpResponse.forward("./webapp/user/login.html");
     }
 
 

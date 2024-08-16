@@ -1,11 +1,8 @@
 package model;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +21,7 @@ public class HttpResponse {
         dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
         dos.writeBytes("Content-Length: " + body.length + "\r\n");
 		writeNewLine();
-		responseBody(body);
+		setBody(body);
 	}
 
 	public void response200WithCookie(byte[] body, String cookieValue) throws IOException {
@@ -33,7 +30,7 @@ public class HttpResponse {
 		dos.writeBytes("Content-Length: " + body.length + "\r\n");
 		dos.writeBytes("Set-Cookie: " + cookieValue + "\r\n");
 		writeNewLine();
-		responseBody(body);
+		setBody(body);
 	}
 
 	public void response302(String host, String redirectUrl) throws IOException{
@@ -59,7 +56,7 @@ public class HttpResponse {
 		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 		dos.writeBytes("Content-Length: " + contentLength + "\r\n");
 		writeNewLine();
-		responseBody(body.getBytes());
+		setBody(body.getBytes());
 	}
 
 	public void response500(String errorMessage) throws IOException {
@@ -79,10 +76,10 @@ public class HttpResponse {
 		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 		dos.writeBytes("Content-Length: " + contentLength + "\r\n");
 		writeNewLine();
-		responseBody(body.getBytes());
+		setBody(body.getBytes());
 	}
 	
-	private void responseBody(byte[] body) throws IOException {
+	private void setBody(byte[] body) throws IOException {
         dos.write(body, 0, body.length);
         dos.flush();
     }
@@ -96,23 +93,23 @@ public class HttpResponse {
 		dos.writeBytes("Content-Type: text/css\r\n");
 		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 		writeNewLine();
-		responseBody(body);
+		setBody(body);
 	}
 
 	public void forward(String url) throws IOException {
-		byte[] fileBytes = Files.readAllBytes(Paths.get(url));
+		byte[] body = Files.readAllBytes(Paths.get(url));
 
 		dos.writeBytes("HTTP/1.1 200 OK \r\n");
-		dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-		dos.writeBytes("Content-Length: " + fileBytes.length + "\r\n");
+		dos.writeBytes("Content-Length: " + body.length + "\r\n");
 		addHeaders();
 		writeNewLine();
-		responseBody(fileBytes);
+		setBody(body);
+
 	}
 
-	public void sendRedirect(String locationUrl) throws IOException{
+	public void sendRedirect(String host, String url) throws IOException{
 		dos.writeBytes("HTTP/1.1 302 Found \r\n");
-		dos.writeBytes("Location: http://" + locationUrl +"\r\n");
+		dos.writeBytes("Location: http://" + host + "/" + url + "\r\n");
 		addHeaders();
 		writeNewLine();
 		dos.flush();

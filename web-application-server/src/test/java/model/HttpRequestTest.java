@@ -12,7 +12,8 @@ public class HttpRequestTest {
     @Test
     public void 쿼리스트링과_X_WWW_FORM_URLENCODED_타입의_바디가_존재하는_POST_파싱_테스트() throws IOException {
         //given
-        String rawRequest = "POST /localhost:8080?test=1 HTTP/1.1\r\n" +
+        String rawRequest = "POST /user/create?test=1 HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
                 "Content-Length: 68\r\n" +
                 "Content-Type: application/x-www-form-urlencoded\r\n" +
                 "\r\n" +
@@ -22,7 +23,8 @@ public class HttpRequestTest {
         //then
         assertAll(
                 () -> assertThat(httpRequest.getMethod()).isEqualTo("POST"),
-                () -> assertThat(httpRequest.getRequestPath()).isEqualTo("/localhost:8080"),
+                () -> assertThat(httpRequest.getHeader("Host")).isEqualTo("localhost:8080"),
+                () -> assertThat(httpRequest.getRequestPath()).isEqualTo("/user/create"),
                 () -> assertThat(httpRequest.getVersion()).isEqualTo("HTTP/1.1"),
                 () -> {
                     assertThat(httpRequest.getParams("test")).isEqualTo("1");
@@ -37,14 +39,14 @@ public class HttpRequestTest {
     @Test
     public void 쿼리_파라미터가_존재하는_GET_파싱_테스트() throws IOException {
         //given
-        String rawRequest = "GET /localhost:8080?name=홍길동&userId=testUser&password=pass123&email=test@example.com HTTP/1.1\r\n" +
+        String rawRequest = "GET /user/create?name=홍길동&userId=testUser&password=pass123&email=test@example.com HTTP/1.1\r\n" +
                 "\r\n";
         //when
         HttpRequest httpRequest = new HttpRequest(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(rawRequest.getBytes()))));
         //then
         assertAll(
                 () -> assertThat(httpRequest.getMethod()).isEqualTo("GET"),
-                () -> assertThat(httpRequest.getUrl()).isEqualTo("/localhost:8080?name=홍길동&userId=testUser&password=pass123&email=test@example.com"),
+                () -> assertThat(httpRequest.getUrl()).isEqualTo("/user/create?name=홍길동&userId=testUser&password=pass123&email=test@example.com"),
                 () -> assertThat(httpRequest.getVersion()).isEqualTo("HTTP/1.1"),
                 () -> {
                     assertThat(httpRequest.getParams("name")).isEqualTo("홍길동");
@@ -53,6 +55,7 @@ public class HttpRequestTest {
                     assertThat(httpRequest.getParams("email")).isEqualTo("test@example.com");
                 }
         );
+
     }
 
 }

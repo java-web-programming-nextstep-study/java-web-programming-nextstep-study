@@ -2,15 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-
-import controller.UserController;
-import dto.RequestDto;
-import dto.ResponseDto;
-import facade.ExceptionFacade;
+import controller.Controller;
+import controller.ControllerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import model.HttpRequest;
 import model.HttpResponse;
 
@@ -18,8 +13,6 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private UserController userController = new UserController();
-    private ExceptionFacade exceptionFacade = new ExceptionFacade(userController);
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -35,45 +28,24 @@ public class RequestHandler extends Thread {
         ) {
             HttpRequest request = new HttpRequest(br);
             HttpResponse response = new HttpResponse(dos);
+            String requestPath = request.getRequestPath();
+            log.info("requestPath: {}", request.getRequestPath());
 
-            if(request.getRequestPath().startsWith("/user")){
-                ResponseDto responseDto = exceptionFacade.run(RequestDto.toDto(request));
-
-                if(responseDto.getStatusCode() == 200) {
-                    byte[] body = readAllBytesOfFile(responseDto.getResourceUrl());
-                    if(responseDto.existsCookieValue()) {
-                        response.response200WithCookie(body, responseDto.getCookieValue());
-                    }
-                    else {
-                        response.forward(responseDto.getResourceUrl());
-                    }
-                }
-                else if(responseDto.getStatusCode() == 302) {
-                    response.sendRedirect(request.getHeader("Host") + "/" + responseDto.getLocation());
-                }
-                else if(responseDto.getStatusCode() == 400) {
-                    response.response400(responseDto.getExceptionMessage());
-                }
-                else if (responseDto.getStatusCode() == 500) {
-                    response.response500(responseDto.getExceptionMessage());
-                }
-
-            }
-            else if(request.getRequestPath().endsWith(".css")) {
-                byte[] body = readAllBytesOfFile("./webapp/" + request.getRequestPath());
-                response.responseCss(body, body.length);
+            if(isStaticFileRequest(requestPath)) {
+                StaticFileHandler staticFileHandler = new StaticFileHandler();
+                staticFileHandler.handle(request, response);
             }
             else {
-                byte[] body = readAllBytesOfFile("./webapp" + request.getRequestPath());
-                response.response200(body);
+                Controller controller = ControllerManager.getController(request.getRequestPath());
+                controller.service(request, response);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private byte[] readAllBytesOfFile(String url) throws IOException{
-        return Files.readAllBytes(new File(url).toPath());
+    private boolean isStaticFileRequest(String requestPath) {
+        return requestPath.endsWith(".css") || requestPath.endsWith(".js") || requestPath.endsWith(".html") ||
+                requestPath.endsWith(".woff") || requestPath.endsWith(".ttf") || requestPath.endsWith(".ico");
     }
 }
-

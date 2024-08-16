@@ -8,9 +8,9 @@ public class ControllerManager {
             "/user", new UserController()
     );
 
-    public static Controller getController(String controllerName) {
+    public static Controller getController(String requestPath) {
         String matchingPath = controllers.keySet().stream()
-                .filter(controllerName::startsWith)
+                .filter(requestPath::startsWith)
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
         return controllers.get(matchingPath);
