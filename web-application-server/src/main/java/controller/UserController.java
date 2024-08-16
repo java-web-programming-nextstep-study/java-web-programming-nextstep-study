@@ -61,7 +61,7 @@ public class UserController extends AbstractController{
         User user = new User(httpRequest.getParams("userId"), httpRequest.getParams("password"), httpRequest.getParams("name"), httpRequest.getParams("email"));
         DataBase.addUser(user);
 
-        httpResponse.sendRedirect(httpRequest.getParams("Host"), "index.html");
+        httpResponse.sendRedirect(httpRequest.getHeader("Host"), "index.html");
     }
 
     private void getLoginForm(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
