@@ -79,7 +79,7 @@ public class UserController extends AbstractController{
         if (userId != null && password != null) {
             User user = DataBase.findUserById(userId);
 
-            if (user != null && user.getPassword().equals(password)) {
+            if (user != null && user.getUserId().equals(userId) && user.getPassword().equals(password)) {
                 httpResponse.addHeader("Set-Cookie", "logined=true");
                 httpResponse.forward("./webapp/index.html");
             } else {

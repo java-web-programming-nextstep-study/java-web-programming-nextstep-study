@@ -57,8 +57,4 @@ public class RequestDto {
     public String getBody() {
         return body;
     }
-
-    public String getCookieValue() {
-        return header.get("Cookie");
-    }
 }
