@@ -1,6 +1,7 @@
 package webserver;
 
 import java.io.BufferedReader;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -27,15 +28,15 @@ public class RequestHandler extends Thread {
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-    }
-
+    }  
+ 
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-        	BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        	BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));  
         	String line = br.readLine();
         	log.debug("request Line : {}", line);
         	if(line == null) {
@@ -48,7 +49,7 @@ public class RequestHandler extends Thread {
         	while(!line.equals("")) {
         		log.debug("header : {}", line);
         		line = br.readLine();
-        		if(line.contains("Content-Length")) {
+        		if(line.contains("Content-Length")) { 
         			contentLength = getContentLength(line);
         		}
         		if(line.contains("Cookie")) {
