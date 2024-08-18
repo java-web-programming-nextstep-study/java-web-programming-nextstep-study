@@ -14,32 +14,22 @@ public class Request {
 	private String body;
 	private Map<String, String> cookies;
 	private boolean isLogined;
-	private Map<String, String> parameters = new HashMap<String, String>();
-	private Map<String, String> header = new HashMap<String, String>();
+	private Map<String, String> parameters;
+	private Map<String, String> header;
 	
-	public Request(BufferedReader in) throws IOException, IllegalArgumentException{
-		String requestLine = readRequestLine(in);
-		parseRequestLine(requestLine);
-		readHeaders(in);
-	} 
-	
-	private String readRequestLine(BufferedReader in) throws IOException{
+	public Request(BufferedReader in) throws IOException, NullPointerException{
 		String requestLine = in.readLine();
-		if(requestLine == null) {
-			throw new IllegalArgumentException("Request line cannot be null");
+		if(requestLine != null) {
+			String[] parts = requestLine.split(" ");
+			this.method = parts[0];
+			this.url = parts[1];
+			this.header = new HashMap<String, String>();
+			parseUrl(parts[1]);
+			readHeaders(in);
 		}
-		return requestLine;
-	}
-	
-	private void parseRequestLine(String requestLine) {
-		String[] parts = requestLine.split(" ");
-		if(parts.length < 2) {
-			throw new IllegalArgumentException("Invalid request line: " + requestLine);
+		else {
+			throw new NullPointerException();
 		}
-		
-		this.method = parts[0];
-		this.url = parts[1];
-		parseUrl(this.url);
 	}
 	 private void parseUrl(String url) {
 	        int questionMarkIndex = url.indexOf('?');
@@ -47,8 +37,11 @@ public class Request {
 	            this.url = url.substring(0, questionMarkIndex);
 	            String queryString = url.substring(questionMarkIndex + 1);
 	            this.parameters = HttpRequestUtils.parseQueryString(queryString);
+	    		
+
 	        } else {
 	            this.url = url;
+	            this.parameters = new HashMap<>();
 	        }
     }
 
@@ -118,7 +111,7 @@ public class Request {
 	public String getHeader(String fieldName) {
 		return header.get(fieldName);
 	}
-	public String getQueryparameter(String parameterName) {
+	public String getParameter(String parameterName) {
 		return parameters.get(parameterName);
 	}
 }
