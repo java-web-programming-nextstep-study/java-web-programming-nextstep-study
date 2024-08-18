@@ -12,7 +12,7 @@ public class CreateUserController extends AbstractController{
 
 	@Override 
 	protected void doGet(Request request, Response response) {
-		model.User newUser = new model.User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"), request.getParameter("email"));
+		model.User newUser = new model.User(request.getQueryparameter("userId"), request.getQueryparameter("password"), request.getQueryparameter("name"), request.getQueryparameter("email"));
 		DataBase.addUser(newUser);
 		response.send("Success", 200);
 	}
