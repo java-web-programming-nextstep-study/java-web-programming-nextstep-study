@@ -42,7 +42,7 @@ public class UserDao {
     }
 
     public List<User> findAll() throws SQLException {
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
             Object mapRow(ResultSet rs) throws SQLException {
                 User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
@@ -51,7 +51,7 @@ public class UserDao {
             }
         };
         String sql = "SELECT * FROM USERS";
-        List<Object> result = selectJdbcTemplate.query(sql);
+        List<Object> result = jdbcTemplate.query(sql);
 
         return result.stream()
             .map(r -> (User) r)
@@ -59,7 +59,7 @@ public class UserDao {
     }
 
     public User findByUserId(String userId) throws SQLException {
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, userId);
@@ -73,6 +73,6 @@ public class UserDao {
             }
         };
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-        return (User) selectJdbcTemplate.queryForObject(sql);
+        return (User) jdbcTemplate.queryForObject(sql);
     }
 }
