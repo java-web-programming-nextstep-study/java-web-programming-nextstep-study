@@ -54,7 +54,7 @@ public class UserDao {
     public User findByUserId(String userId) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate() {};
 
-        String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
+        String sql = "SELECT userId, password, name, email FROM USERS WHERE userId= ?";
         RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
             rs.getString("email"));
         PreparedStatementSetter setter = (pstmt) -> pstmt.setString(1, userId);
