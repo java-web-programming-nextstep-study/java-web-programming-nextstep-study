@@ -9,24 +9,30 @@ import java.sql.SQLException;
 
 public class InsertJdbcTemplate {
 
-    public void insert(User user, UserDao userDao) throws SQLException {
+    public void insert(User user) throws SQLException {
         Connection con = null;
         PreparedStatement pstmt = null;
         try {
             con = ConnectionManager.getConnection();
-            String sql = userDao.createQueryForInsert();
+            String sql = createQueryForInsert();
             pstmt = con.prepareStatement(sql);
-            userDao.setValuesForInsert(user, pstmt);
+            setValuesForInsert(user, pstmt);
 
             pstmt.executeUpdate();
         } finally {
             if (pstmt != null) {
                 pstmt.close();
             }
-
             if (con != null) {
                 con.close();
             }
         }
+    }
+
+    String createQueryForInsert() {
+        return null;
+    }
+
+    void setValuesForInsert(User user, PreparedStatement pstmt) throws SQLException {
     }
 }
