@@ -1,6 +1,6 @@
-package core.jdbc;
+package next.dao;
 
-import next.dao.UserDao;
+import core.jdbc.ConnectionManager;
 import next.model.User;
 
 import java.sql.Connection;
@@ -14,9 +14,9 @@ public class InsertJdbcTemplate {
         PreparedStatement pstmt = null;
         try {
             con = ConnectionManager.getConnection();
-            String sql = createQueryForInsert();
+            String sql = userDao.createQueryForInsert();
             pstmt = con.prepareStatement(sql);
-            setValuesForInsert(user, pstmt);
+            userDao.setValuesForInsert(user, pstmt);
 
             pstmt.executeUpdate();
         } finally {
@@ -28,17 +28,5 @@ public class InsertJdbcTemplate {
                 con.close();
             }
         }
-    }
-
-    String createQueryForInsert() {
-        String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-        return sql;
-    }
-
-    void setValuesForInsert(User user, PreparedStatement pstmt) throws SQLException {
-        pstmt.setString(1, user.getUserId());
-        pstmt.setString(2, user.getPassword());
-        pstmt.setString(3, user.getName());
-        pstmt.setString(4, user.getEmail());
     }
 }

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import core.jdbc.ConnectionManager;
-import core.jdbc.InsertJdbcTemplate;
-import core.jdbc.UpdateJdbcTemplate;
 import next.model.User;
 
 public class UserDao {
@@ -19,9 +17,34 @@ public class UserDao {
         insertJdbcTemplate.insert(user, new UserDao());
     }
 
+    String createQueryForInsert() {
+        String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
+        return sql;
+    }
+
+    void setValuesForInsert(User user, PreparedStatement pstmt) throws SQLException {
+        pstmt.setString(1, user.getUserId());
+        pstmt.setString(2, user.getPassword());
+        pstmt.setString(3, user.getName());
+        pstmt.setString(4, user.getEmail());
+    }
+
     public void update(User user) throws SQLException {
         UpdateJdbcTemplate updateJdbcTemplate = new UpdateJdbcTemplate();
         updateJdbcTemplate.update(user, new UserDao());
+    }
+
+    String createQueryForUpdate() {
+        String sql = "UPDATE USERS SET userId = ?, password = ?, name = ?, email = ? WHERE userId = ?";
+        return sql;
+    }
+
+    void setValuesForUpdate(User user, PreparedStatement pstmt) throws SQLException {
+        pstmt.setString(1, user.getUserId());
+        pstmt.setString(2, user.getPassword());
+        pstmt.setString(3, user.getName());
+        pstmt.setString(4, user.getEmail());
+        pstmt.setString(5, user.getUserId());
     }
 
     public List<User> findAll() throws SQLException {
