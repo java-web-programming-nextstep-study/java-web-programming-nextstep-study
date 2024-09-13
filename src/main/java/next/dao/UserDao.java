@@ -13,6 +13,11 @@ public class UserDao {
     public void insert(User user) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
+
+            @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
                 pstmt.setString(2, user.getPassword());
@@ -27,6 +32,11 @@ public class UserDao {
 
     public void update(User user) throws SQLException {
         JdbcTemplate updateJdbcTemplate = new JdbcTemplate() {
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
+
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
@@ -48,6 +58,11 @@ public class UserDao {
                 User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
                     rs.getString("email"));
                 return user;
+            }
+
+            @Override
+            void setValues(PreparedStatement pstmt) throws SQLException {
+
             }
         };
         String sql = "SELECT * FROM USERS";

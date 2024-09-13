@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcTemplate {
+public abstract class JdbcTemplate {
 
     public void update(String sql) throws SQLException {
         Connection con = null;
@@ -90,10 +90,7 @@ public class JdbcTemplate {
         }
     }
 
-    Object mapRow(ResultSet rs) throws SQLException {
-        return null;
-    }
+    abstract Object mapRow(ResultSet rs) throws SQLException;
 
-    void setValues(PreparedStatement pstmt) throws SQLException {
-    }
+    abstract void setValues(PreparedStatement pstmt) throws SQLException;
 }
