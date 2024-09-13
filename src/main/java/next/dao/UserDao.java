@@ -44,7 +44,7 @@ public class UserDao {
                 rs.getString("email"));
         PreparedStatementSetter setter = (pstmt) -> {};
 
-        return jdbcTemplate.query(sql, setter, rowMapper);
+        return jdbcTemplate.query(sql, rowMapper, setter);
     }
 
     public User findByUserId(String userId) throws SQLException {
@@ -55,6 +55,6 @@ public class UserDao {
             rs.getString("email"));
         PreparedStatementSetter setter = (pstmt) -> pstmt.setString(1, userId);
 
-        return jdbcTemplate.queryForObject(sql, setter, rowMapper);
+        return jdbcTemplate.queryForObject(sql, rowMapper, setter);
     }
 }
