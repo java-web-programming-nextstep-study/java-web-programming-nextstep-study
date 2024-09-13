@@ -1,7 +1,6 @@
 package next.dao;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,11 +11,6 @@ public class UserDao {
 
     public void insert(User user) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate() {
-            @Override
-            Object mapRow(ResultSet rs) throws SQLException {
-                return null;
-            }
-
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
@@ -32,11 +26,6 @@ public class UserDao {
 
     public void update(User user) throws SQLException {
         JdbcTemplate updateJdbcTemplate = new JdbcTemplate() {
-            @Override
-            Object mapRow(ResultSet rs) throws SQLException {
-                return null;
-            }
-
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
@@ -54,19 +43,15 @@ public class UserDao {
     public List<User> findAll() throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
-            Object mapRow(ResultSet rs) throws SQLException {
-                User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                    rs.getString("email"));
-                return user;
-            }
-
-            @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
 
             }
         };
         String sql = "SELECT * FROM USERS";
-        List<Object> result = jdbcTemplate.query(sql);
+        RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+                rs.getString("email"));
+
+        List<Object> result = jdbcTemplate.query(sql, rowMapper);
 
         return result.stream()
             .map(r -> (User) r)
@@ -79,15 +64,13 @@ public class UserDao {
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, userId);
             }
-
-            @Override
-            User mapRow(ResultSet rs) throws SQLException {
-                User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                    rs.getString("email"));
-                return user;
-            }
         };
+
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-        return (User) jdbcTemplate.queryForObject(sql);
+        RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+            rs.getString("email"));
+
+        return (User) jdbcTemplate.queryForObject(sql, rowMapper);
     }
+
 }
