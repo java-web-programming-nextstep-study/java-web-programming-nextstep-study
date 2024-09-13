@@ -9,7 +9,7 @@ import next.model.User;
 public class UserDao {
 
     public void insert(User user) throws SQLException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {};
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
         PreparedStatementSetter setter = (pstmt) -> {
@@ -23,7 +23,7 @@ public class UserDao {
     }
 
     public void update(User user) throws SQLException {
-        JdbcTemplate updateJdbcTemplate = new JdbcTemplate() {};
+        JdbcTemplate updateJdbcTemplate = new JdbcTemplate();
 
         String sql = "UPDATE USERS SET userId = ?, password = ?, name = ?, email = ? WHERE userId = ?";
         PreparedStatementSetter setter = (pstmt) -> {
@@ -38,7 +38,7 @@ public class UserDao {
     }
 
     public List<User> findAll() throws SQLException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {};
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
         String sql = "SELECT * FROM USERS";
         RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
                 rs.getString("email"));
@@ -52,7 +52,7 @@ public class UserDao {
     }
 
     public User findByUserId(String userId) throws SQLException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {};
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userId= ?";
         RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
