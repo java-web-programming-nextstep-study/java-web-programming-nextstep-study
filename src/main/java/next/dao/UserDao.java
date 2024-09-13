@@ -40,26 +40,21 @@ public class UserDao {
     public List<User> findAll() throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
         String sql = "SELECT * FROM USERS";
-        RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+        RowMapper<User> rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
                 rs.getString("email"));
         PreparedStatementSetter setter = (pstmt) -> {};
 
-        List<Object> result = jdbcTemplate.query(sql, setter, rowMapper);
-
-        return result.stream()
-            .map(r -> (User) r)
-            .collect(Collectors.toList());
+        return jdbcTemplate.query(sql, setter, rowMapper);
     }
 
     public User findByUserId(String userId) throws SQLException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userId= ?";
-        RowMapper rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+        RowMapper<User> rowMapper = (rs) -> new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
             rs.getString("email"));
         PreparedStatementSetter setter = (pstmt) -> pstmt.setString(1, userId);
 
-        return (User) jdbcTemplate.queryForObject(sql, setter, rowMapper);
+        return jdbcTemplate.queryForObject(sql, setter, rowMapper);
     }
-
 }

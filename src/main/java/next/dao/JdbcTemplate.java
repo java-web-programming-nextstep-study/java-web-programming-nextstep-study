@@ -22,13 +22,13 @@ public class JdbcTemplate {
         }
     }
 
-    public List<Object> query(String sql, PreparedStatementSetter pstmtSetter, RowMapper rowMapper) {
+    public <T> List<T> query(String sql, PreparedStatementSetter pstmtSetter, RowMapper<T> rowMapper) {
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql);
         ) {
             pstmtSetter.values(pstmt);
 
-            List<Object> list = new ArrayList<>();
+            List<T> list = new ArrayList<>();
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -42,19 +42,18 @@ public class JdbcTemplate {
         }
     }
 
-    public Object queryForObject(String sql, PreparedStatementSetter pstmtSetter, RowMapper rowMapper) {
+    public <T> T queryForObject(String sql, PreparedStatementSetter pstmtSetter, RowMapper<T> rowMapper) {
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql);
         ) {
             pstmtSetter.values(pstmt);
 
             try (ResultSet rs = pstmt.executeQuery()) {
-                Object object = null;
                 if (rs.next()) {
-                    object = rowMapper.mapRow(rs);
+                    return rowMapper.mapRow(rs);
                 }
 
-                return object;
+                return null;
             }
         } catch (SQLException e) {
             throw new DataAccessException(e);
